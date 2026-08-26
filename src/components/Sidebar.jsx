@@ -11,11 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-import {
-  useEffect,
-  useState,
-} from "react";
-
+import { useEffect, useState } from "react";
 import {
   useLocation,
   useNavigate,
@@ -31,47 +27,43 @@ function Sidebar({ onCreatePost }) {
 
   const [notificationCount, setNotificationCount] =
     useState(() => {
-      return Number(
-        localStorage.getItem(
-          "socially_notification_count"
-        ) || 3
+      const saved = localStorage.getItem(
+        "socially_notification_count"
       );
+
+      return saved !== null ? Number(saved) : 3;
     });
 
-  /* =========================================
-     NOTIFICATION COUNT
-  ========================================= */
-
   useEffect(() => {
-    const updateCount = () => {
-      const count = Number(
-        localStorage.getItem(
-          "socially_notification_count"
-        ) || 0
+    const updateNotificationCount = () => {
+      const saved = localStorage.getItem(
+        "socially_notification_count"
       );
 
-      setNotificationCount(count);
+      setNotificationCount(
+        saved !== null ? Number(saved) : 0
+      );
     };
 
     window.addEventListener(
       "socially-notifications-updated",
-      updateCount
+      updateNotificationCount
     );
 
     window.addEventListener(
       "storage",
-      updateCount
+      updateNotificationCount
     );
 
     return () => {
       window.removeEventListener(
         "socially-notifications-updated",
-        updateCount
+        updateNotificationCount
       );
 
       window.removeEventListener(
         "storage",
-        updateCount
+        updateNotificationCount
       );
     };
   }, []);
@@ -117,6 +109,11 @@ function Sidebar({ onCreatePost }) {
       icon: User,
       path: "/profile",
     },
+    {
+      label: "Settings",
+      icon: Settings,
+      path: "/settings",
+    },
   ];
 
   const handleItemClick = (item) => {
@@ -140,9 +137,9 @@ function Sidebar({ onCreatePost }) {
 
   return (
     <aside className="fixed left-0 top-0 z-50 hidden h-screen w-[250px] border-r border-slate-200 bg-white lg:flex lg:flex-col">
+      
       {/* LOGO */}
-
-      <div className="px-7 pb-7 pt-8">
+      <div className="shrink-0 px-7 pb-7 pt-8">
         <button
           type="button"
           onClick={() => navigate("/")}
@@ -159,15 +156,13 @@ function Sidebar({ onCreatePost }) {
       </div>
 
       {/* NAVIGATION */}
-
-      <nav className="flex-1 px-4">
+      <nav className="flex-1 overflow-y-auto px-4 pb-4">
         <div className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
 
             const active =
-              item.path ===
-              location.pathname;
+              item.path === location.pathname;
 
             return (
               <button
@@ -191,12 +186,10 @@ function Sidebar({ onCreatePost }) {
 
                 <span>{item.label}</span>
 
-                {item.label ===
-                  "Notifications" &&
+                {item.label === "Notifications" &&
                   notificationCount > 0 && (
                     <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
-                      {notificationCount >
-                      99
+                      {notificationCount > 99
                         ? "99+"
                         : notificationCount}
                     </span>
@@ -207,32 +200,15 @@ function Sidebar({ onCreatePost }) {
         </div>
       </nav>
 
-      {/* BOTTOM */}
-
-      <div className="border-t border-slate-100 p-4">
-        <button
-          type="button"
-          onClick={() =>
-            navigate("/settings")
-          }
-          className={`mb-1 flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition ${
-            location.pathname ===
-            "/settings"
-              ? "bg-slate-900 text-white"
-              : "text-slate-600 hover:bg-slate-100"
-          }`}
-        >
-          <Settings size={20} />
-          Settings
-        </button>
-
+      {/* LOGOUT */}
+      <div className="shrink-0 border-t border-slate-100 p-4">
         <button
           type="button"
           onClick={handleLogout}
           className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-red-500 transition hover:bg-red-50"
         >
           <LogOut size={20} />
-          Logout
+          <span>Logout</span>
         </button>
       </div>
     </aside>
